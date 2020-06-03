@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <button class="btn btn-primary m-2" onclick="showProductAll()">Show Product</button>
+            <button class="btn btn-primary m-2" onclick="addProductForm()">Add a Product</button>
+            <button class="btn btn-primary m-2" onclick="receiveStockForm()">Receive Stock</button>
+        </div>
+        <div id="mytable01"></div>
+        <div id="myform">
+            <form>
+                <h4 id="formHeader">Add a new Product</h4>
+                <div class="form-group">
+                    <label for="prod">Prod</label>
+                    <input type="text" class="form-control" id="prod" placeholder="Enter product">
+                </div>
+                <div class="form-group" id="divcat">
+                    <label for="category">Category</label>
+                    <input type="text" class="form-control" id="category" placeholder="Enter category">
+                </div>
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="number" class="form-control" id="price" placeholder="Enter price">
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" class="form-control" id="quantity" placeholder="Enter quantity">
+                </div>
+                <div class="form-group" id="divnewarr">
+                    <input type="checkbox" id="newarr">New Arrival
+                </div>
+                <div class="form-group" id="divfeatured">
+                    <input type="checkbox" id="featured">Featured
+                </div>
+                <div class="form-group">
+                    On Offer 
+                    <input type="radio" name="offer" id="offer1">10%
+                    <input type="radio" name="offer" id="offer2">15%
+                    <input type="radio" name="offer" id="offer3">none
+                </div>
+                <div class="form-group" id="divdeliv">
+                    Home Delivery
+                    <input type="radio" name="deliv" id="deliv1">Yes
+                    <input type="radio" name="deliv" id="deliv2">No
+                </div>
+                <button type="submit" class="btn btn-primary" onclick="addProd()">Submit</button>
+            </form>
+        </div>
+    </div>
+</body>
+<script>
+    let products = [{"prod":"Pepsi","price":12,"quantity":16,"category":"Food","newarrival":true,"featured":false,"offer":"10%","homedelivery":"No"},
+                    {"prod":"Coke","price":15,"quantity":12,"category":"Food","newarrival":false,"featured":false,"offer":"15%","homedelivery":"Yes"},
+                    {"prod":"Mirinda","price":30,"quantity":15,"category":"Food","newarrival":true,"featured":true,"offer":"10%","homedelivery":"No"},
+                    {"prod":"Red	Bull","price":80,"quantity":2,"category":"Food","newarrival":true,"featured":false,"offer":"None","homedelivery":"No"},
+                    {"prod":"Lux","price":10,"quantity":11,"category":"Soap","newarrival":false,"featured":false,"offer":"15%","homedelivery":"Yes"},
+                    {"prod":"Dove","price":25,"quantity":4,"category":"Soap","newarrival":true,"featured":true,"offer":"10%","homedelivery":"Yes"},
+                    {"prod":"Dettol","price":15,"quantity":6,"category":"Soap","newarrival":true,"featured":false,"offer":"None","homedelivery":"Yes"},
+                    {"prod":"Pantene","price":60,"quantity":3,"category":"Shampoo","newarrival":false,"featured":true,"offer":"None","homedelivery":"Yes"}];
+    let categories = ["Food","Soap","Shampoo"];                
+
+    editIndex=-1;                
+    
+    let form1=document.getElementById("myform").innerHTML;
+    document.getElementById("myform").innerHTML="";
+
+    function makeDDOption(arr){
+        let str="";
+        for(let item of arr){
+            str += "<option>"+item.prod+"</option>";
+        }
+        return str;
+    }
+
+    function showProductAll(){
+        showProducts(products);
+    }             
+    
+    function plusProduct(index){
+        products[index].quantity++;
+        showProductAll();
+    }
+
+    function minusProduct(index){
+        if(products[index].quantity >0){
+            products[index].quantity--;
+        }
+        showProductAll();
+    }
+
+    function addProductForm(){
+        let element=document.getElementById("mytable01");
+        element.innerHTML=form1;
+        let divcat=document.getElementById("divcat");
+        divcat.innerHTML=showCategoryOptions("");
+        editIndex=-1;
+    }
+
+    function receiveStockForm(){
+        let str = "<div id='myform2'><form>";
+        str += '<h4 id="formHeader2">Receive Stock</h4>';
+        str += '<div class="form-group">';
+        str += '<select id="prod" class="form-control"><option selected disabled>Select Product Name</option>';
+        str += makeDDOption(products);
+        str += '</select></div><div class="form-group">';
+        str += '<label for="quantity">Quantity</label>';
+        str += '<input type="number" class="form-control" id="quantity" placeholder="Enter quantity"></div>';
+        str += '<button type="submit" class="btn btn-primary" onclick="receiveStock()">Receive Stock</button></form></div>';
+
+        let element=document.getElementById("mytable01");
+        element.innerHTML=str;
+    }
+
+    function receiveStock(){
+        let prod = document.getElementById('prod').value;
+        let qty = Number(document.getElementById('quantity').value);
+        for(let product of products){
+            if(prod === product.prod) product.quantity += qty;
+        }
+        showProductAll();
+    }
+
+    function addProd(){
+        let p1=document.getElementById("prod").value;
+        let pr1=document.getElementById("price").value;
+        let q1=document.getElementById("quantity").value;
+        let c1=document.getElementById("category").value;
+        let na=document.getElementById("newarr").checked;
+        let fe=document.getElementById("featured").checked;
+        let offer, deliv;
+        if(document.getElementById('offer1').checked) offer = "10%";
+        else if(document.getElementById('offer2').checked) offer = "15%";
+        else if(document.getElementById('offer3').checked) offer = "none";
+        if(document.getElementById("deliv1").checked) deliv = "Yes";
+        else if(document.getElementById("deliv2").checked) deliv = "no";
+        let product = {"prod":p1,"price":pr1,"quantity":q1,"category":c1,"newarrival":na,"featured":fe,"offer":offer,"homedelivery":deliv};
+        if(editIndex===-1)
+        products.push(product);
+        else 
+        products[editIndex]=product;
+        showProductAll();
+    }
+
+    function showProducts(data){
+        let header = "<div class='row border bg-dark text-white'><div class='col-2' onclick='sort(0)'>Name</div>";
+        header += "<div class='col-1' onclick='sort(1)'>Categorie</div>";
+        header += "<div class='col-1' onclick='sort(2)'>Price</div>";
+        header += "<div class='col-1' onclick='sort(3)'>Quantity</div>";
+        header += "<div class='col-1' onclick='sort(3)'>Offer</div>";
+        header += "<div class='col-1' onclick='sort(3)'>Delivery</div>";
+        header += "<div class='col-1' onclick='sort(3)'>Featured</div>";
+        header += "<div class='col-1' onclick='sort(3)'>New Arr.</div>";
+        header += "<div class='col-3'></div>";
+        header += "</div>";
+        let mapProducts = data.map(makeElement);
+        let strData = mapProducts.join(" ");
+        let element = document.getElementById("mytable01");
+        element.innerHTML = header+strData;
+    }
+
+    function makeElement(pro,index){
+        let str = "<div class='row border'><div class='col-2'>"+pro.prod+"</div>";
+        str += "<div class='col-1'>"+pro.category+"</div>";
+        str += "<div class='col-1'>"+pro.price+"</div>";
+        str += "<div class='col-1'>"+pro.quantity+"</div>";
+        str += "<div class='col-1'>"+pro.offer+"</div>";
+        str += "<div class='col-1'>"+pro.homedelivery+"</div>";
+        str += "<div class='col-1'>"+pro.featured+"</div>";
+        str += "<div class='col-1'>"+pro.newarrival+"</div>";
+        str += "<div class='col-3'><button class='btn btn-sm mr-2 btn-primary' onclick=editProduct("+index+")>Edit</button><button class='btn btn-sm mr-3 btn-danger' onclick=deleteProduct("+index+")>Delete</button><button class='btn btn-sm mr-2 btn-success' onclick=plusProduct("+index+")>+</button><button class='btn btn-sm btn-danger' onclick=minusProduct("+index+")>-</button></div>";
+        str = str+"</div>";
+        return str;
+    }
+
+    function deleteProduct(index){
+        products.splice(index, 1);
+        showProductAll();
+    }
+
+    function editProduct(index){
+        let product=products[index];
+        editIndex=index;
+        let element=document.getElementById("mytable01");
+        element.innerHTML=form1;
+        let fheader=document.getElementById("formHeader");
+        fheader.innerHTML="Edit Details";
+        let fprod=document.getElementById("prod");
+        fprod.value=product.prod;
+        let fprice=document.getElementById("price");
+        fprice.value=product.price;
+        let fquantity=document.getElementById("quantity");
+        fquantity.value=product.quantity;
+        let divcat=document.getElementById("divcat");
+        divcat.innerHTML=showCategoryOptions(product.category);
+    }
+
+    function sort(index){
+        let data=[...products];
+        switch(index){
+            case 0:data.sort(sortProd);
+            break;
+            case 1:data.sort(sortPrice);
+            break;
+            case 2:data.sort(sortQuantity);
+            break;
+            case 3:data.sort(sortCategory);
+            break;
+        }
+        showProducts(data);
+    }
+
+    function sortProd(p1,p2){
+        return p1.prod.localeCompare(p2.prod);
+    }
+    function sortPrice(p1,p2){
+        return p1.price-p2.price;
+    }
+    function sortQuantity(p1,p2){
+        return p1.quantity-p2.quantity;
+    }
+    function sortCategory(p1,p2){
+        return p1.category.localeCompare(p2.category);
+    }
+
+    function showCategoryOptions(selectedCategory){
+        let options = categories.map(c1 =>({"display":c1,"value":c1}));
+        options.unshift({"display":"Select Category","value":""});
+        let optionsMap = options.map(opt=>makeCategoryOption(opt,selectedCategory));
+        let strCat = optionsMap.join(" ");
+        let selectStr = "<select id='category' class='form-control'>"+strCat+"</select>";
+        return selectStr;
+    }
+
+    function makeCategoryOption(opt,category1){
+        let sel="";
+        if(opt.value===category1)
+        sel="selected";
+        return "<option value = '"+opt.value+"'"+sel+">"+opt.display+"</option>";
+    }
+</script>
+</html>
